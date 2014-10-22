@@ -334,11 +334,8 @@ EOS
 
 LOOKUP = %w(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9 + /).freeze
 
-def hex_to_base_64(string)
-  binary = ""
-  string.each_char.each_with_object(binary) do |c, binary|
-    binary << "%04b" % Integer(c, 16)
-  end
+def hex_string_to_base_64(hex_string)
+  binary = hex_string_to_binary_string(hex_string)
 
   binary = binary + "0" * (6 - binary.size % 6) unless binary.size % 6 == 0
 
@@ -347,6 +344,14 @@ def hex_to_base_64(string)
     accum << LOOKUP[Integer(s.join(''), 2)]
   end
   accum
+end
+
+def hex_string_to_binary_string(hex_string)
+  binary = ""
+  hex_string.each_char.each do |c|
+    binary << "%04b" % Integer(c, 16)
+  end
+  binary
 end
 
 def fixed_XOR(string1, string2)
@@ -426,14 +431,24 @@ def hamming_distance(string1, string2)
   zipped.map{|e| e[0] ^ e[1]}.map{|e| "%08b" % e}.join.each_char.count{ |e| e == "1" }
 end
 
+def hamming_distance_for_key_size(size, string)
+  string1 = string[0,size]
+  string2 = string[size,size]
+  hamming_distance(string1, string2)
+end
+
+def reverse_base64_lookup(char)
+  LOOKUP.index(char)
+end
+
 Class.new(Minitest::Test) do
-  def test_hex_to_base_64
+  def test_hex_string_to_base_64
     input =
 "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d"
     output =
       "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t"
 
-    assert_equal(hex_to_base_64(input), output)
+    assert_equal(hex_string_to_base_64(input), output)
   end
 
   def test_fixed_xor
@@ -453,5 +468,13 @@ I go crazy when I hear a cymbal
     input2 = "wokka wokka!!!"
 
     assert_equal(hamming_distance(input1,input2), 37)
+    assert_equal(hamming_distance(input2,input1), 37)
+  end
+
+  def test_reverse_base64_lookup
+    assert_equal(reverse_base64_lookup("A") ,0)
+    assert_equal(reverse_base64_lookup("Z") ,25)
   end
 end
+
+binding.pry
