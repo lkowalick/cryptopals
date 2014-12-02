@@ -441,14 +441,14 @@ def reverse_base64_lookup(char)
   LOOKUP.index(char)
 end
 
-Class.new(Minitest::Test) do
+Class.new(Minitest::Terst) do
   def test_hex_string_to_base_64
     input =
 "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d"
     output =
       "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t"
 
-    assert_equal(hex_string_to_base_64(input), output)
+    assert_equal(output, hex_string_to_base_64(input))
   end
 
   def test_fixed_xor
@@ -467,14 +467,16 @@ I go crazy when I hear a cymbal
     input1 = "this is a test"
     input2 = "wokka wokka!!!"
 
-    assert_equal(hamming_distance(input1,input2), 37)
-    assert_equal(hamming_distance(input2,input1), 37)
+    assert_equal(37, hamming_distance(input1,input2))
+    assert_equal(37, hamming_distance(input2,input1))
   end
 
   def test_reverse_base64_lookup
-    assert_equal(reverse_base64_lookup("A") ,0)
-    assert_equal(reverse_base64_lookup("Z") ,25)
+    assert_equal(0, reverse_base64_lookup("A"))
+    assert_equal(25, reverse_base64_lookup("Z"))
+  end
+
+  def test_array_of_integers_to_hex_string
+    assert_equal("","")
   end
 end
-
-binding.pry
