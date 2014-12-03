@@ -1,2 +1,11 @@
 * Break repeating key XOR
-** 
+
+For each keysize, take the first keysize
+worth of bytes, and the second keysize worth of bytes and find the
+distance between them. Normalize this by dividing by the key size.
+
+The keysize with the smallest normalized edit distance is probably
+the correct keysize. You could perhaps proceed with the smallest 2-3
+keysize values; or take 4 keysize blocks instead of two and average
+each of the pairwise distances.
+
