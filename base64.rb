@@ -378,6 +378,21 @@ def bytes_to_string(bytes)
   bytes.map(&:chr).join
 end
 
+def base_64_to_string(input)
+  input.unpack("m").first
+end
+
+def average_hamming_distance_for_keysize(keysize)
+  base64 = File.read("1_6.txt")
+  string = base_64_to_string(base64)
+end
+
+def first_four_slices_for_size(string, size)
+  (0..3).map do |i|
+    string[i*size,size]
+  end
+end
+
 def score(string)
   string.each_char.map{|c|POINTS[c.downcase]||0}.inject(&:+)
 end
@@ -413,6 +428,7 @@ end
 def best_guess_for_hex_string(hex_string)
   (0..255).map{|l| xor_with_character(hex_string,l.chr)}.max_by{|str| score(str)}
 end
+
 
 def score_for(hex_string)
   score(best_guess_for_hex_string(hex_string))
@@ -478,5 +494,17 @@ I go crazy when I hear a cymbal
 
   def test_array_of_integers_to_hex_string
     assert_equal("","")
+  end
+
+  def test_base_64_to_string
+    output = "any carnal pleasur"
+    input = "YW55IGNhcm5hbCBwbGVhc3Vy"
+    assert_equal(output, base_64_to_string(input))
+  end
+
+  def test_first_four_slices_for_size
+    input = "001002003004005"
+    output = ["001","002","003","004"]
+    assert_equal(output, first_four_slices_for_size(input, 3))
   end
 end
