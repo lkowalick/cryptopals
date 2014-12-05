@@ -457,6 +457,14 @@ def reverse_base64_lookup(char)
   LOOKUP.index(char)
 end
 
+def average_pairwise_normalized_hamming_distance(array_of_strings)
+  total = array_of_strings.combination(2).inject(0) do |accum,(one, two)|
+    accum += hamming_distance(one, two)
+  end
+
+  Float(total)/array_of_strings[0].length
+end
+
 Class.new(Minitest::Test) do
   def test_hex_string_to_base_64
     input =
@@ -507,4 +515,23 @@ I go crazy when I hear a cymbal
     output = ["001","002","003","004"]
     assert_equal(output, first_four_slices_for_size(input, 3))
   end
+
+  def test_average_pairwise_normalized_hamming_distance
+    output = 74.0/("this is a test".length)
+
+    input = ["this is a test", "wokka wokka!!!", "wokka wokka!!!"]
+
+    assert_equal(output, average_pairwise_normalized_hamming_distance(input))
+  end
 end
+
+BreakingRepeatingXOR = Class.new do
+  def best_keysize
+    string = File.read("1_6.txt")
+    raw_string = base_64_to_string(string)
+    (2..40).map do |ks|
+      [ks,average_pairwise_normalized_hamming_distance(first_four_slices_for_size(raw_string, ks))]
+    end
+  end
+end
+
