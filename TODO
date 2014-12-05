@@ -9,3 +9,8 @@ the correct keysize. You could perhaps proceed with the smallest 2-3
 keysize values; or take 4 keysize blocks instead of two and average
 each of the pairwise distances.
 
+Answer: A keysize of 29 seems to be the best
+
+I should maybe be careful about the string encoding? I'm not sure if
+the substring business I did will actually work correctly
+
