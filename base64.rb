@@ -526,7 +526,7 @@ I go crazy when I hear a cymbal
 end
 
 BreakingRepeatingXOR = Class.new do
-  def best_keysize
+  def self.best_keysize
     string = File.read("1_6.txt")
     raw_string = base_64_to_string(string)
     (2..40).map do |ks|
@@ -534,4 +534,5 @@ BreakingRepeatingXOR = Class.new do
     end
   end
 end
+# It would appear that the keysize is 29?
 
