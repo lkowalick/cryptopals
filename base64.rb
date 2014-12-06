@@ -474,10 +474,6 @@ def hamming_distance_for_key_size(size, string)
   hamming_distance(string1, string2)
 end
 
-def reverse_base64_lookup(char)
-  LOOKUP.index(char)
-end
-
 def average_pairwise_normalized_hamming_distance(array_of_strings)
   total = array_of_strings.combination(2).inject(0) do |accum,(one, two)|
     accum += hamming_distance(one, two)
@@ -514,11 +510,6 @@ I go crazy when I hear a cymbal
 
     assert_equal(37, hamming_distance(input1,input2))
     assert_equal(37, hamming_distance(input2,input1))
-  end
-
-  def test_reverse_base64_lookup
-    assert_equal(0, reverse_base64_lookup("A"))
-    assert_equal(25, reverse_base64_lookup("Z"))
   end
 
   def test_array_of_integers_to_hex_string
