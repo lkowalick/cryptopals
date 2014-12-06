@@ -548,3 +548,68 @@ BreakingRepeatingXOR = Class.new do
 end
 # It would appear that the keysize is 29?
 
+# Here n should be between 0 and 28
+def block_for_position(string, n)
+  string.each_char.each_slice(29).map{|slice| slice[n]}.join
+end
+
+Class.new(Minitest::Test) do
+  def test_block_for_position
+    string = "abcdefghijklmnopqrstuvwxyzabc"+
+             "ABCDEFGHIJKLMNOPQRSTUVWXYZABC"
+
+    output = { 2 => "cC", 25 => "zZ" }
+
+    [2,25].each do |n|
+      assert_equal(output[n], block_for_position(string, n))
+    end
+  end
+end
+
+def score_for_char(string, char)
+  score(new_fixed_xor(string, char))
+end
+
+Class.new(Minitest::Test) do
+  def test_score_for_char
+    input = new_fixed_xor("ll\t", "c")
+
+    assert_equal(7, score_for_char(input, "c"))
+  end
+end
+
+def best_char_for_string(string)
+  accum = []
+  ("a".."z").each do |c|
+    accum << [c, score_for_char(string, c)]
+  end
+  ("A".."Z").each do |c|
+    accum << [c, score_for_char(string, c)]
+  end
+  sorted = accum.sort_by {|a| a[1]}
+  sorted.last[0]
+end
+
+
+Class.new(Minitest::Test) do
+  def test_best_char_for_string
+    input = new_fixed_xor("I want a banana and need eet reeely badly", "c")
+
+    assert_equal("c", best_char_for_string(input))
+  end
+end
+
+Class.new(Minitest::Test) do
+  def test_thing_to_do
+    string = base_64_to_string(File.read("1_6.txt").delete("\n"))
+    accum = ""
+    (0..28).each do |pos|
+      blockstring = block_for_position(string, pos)
+      char = best_char_for_string(blockstring)
+
+      accum << char
+    end
+
+    puts new_fixed_xor(string, accum)
+  end
+end
