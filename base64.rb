@@ -454,6 +454,11 @@ def fixed_xor(string,fixed)
   bytes_to_hex(string.each_char.zip(fixed.each_char.cycle).map{|e| xor_chars(*e)})
 end
 
+def new_fixed_xor(string, key)
+  string.each_char.zip(key.each_char.cycle).map{|e| xor_chars(*e).chr}.join
+end
+
+
 def xor_chars(char1, char2)
   char1.bytes[0] ^ char2.bytes[0]
 end
