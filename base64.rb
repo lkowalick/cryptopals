@@ -394,23 +394,39 @@ def first_four_slices_for_size(string, size)
 end
 
 def score(string)
-  string.each_char.map{|c|POINTS[c.downcase]||0}.inject(&:+)
+  string.each_char.map do |c|
+    case c
+    when 'e'
+      12.7#1
+    when 't'
+      9.1#2
+    when 'a'
+      8.2#3
+    when 'o'
+      7.5#4
+    when 'i'
+      7.0#5
+    when 'n'
+      6.7#6
+    when 's'
+      6.3#7
+    when 'h'
+      6.1#8
+    when 'r'
+      6.0#9
+    when 'd'
+      4.3#10
+    when 'l'
+      4.0#11
+    when 'c'
+      2.8#12
+    when /[^[:print:]\x00]/
+      -20.0
+    else
+      0
+    end
+  end.inject(&:+)
 end
-
-POINTS = {
-'e' => 12.7,#1
-'t' => 9.1,#2
-'a' => 8.2,#3
-'o' => 7.5,#4
-'i' => 7.0,#5
-'n' => 6.7,#6
-'s' => 6.3,#7
-'h' => 6.1,#8
-'r' => 6.0,#9
-'d' => 4.3,#10
-'l' => 4.0,#11
-'c' => 2.8,#12
-}
 
 def xor_with_character(hex_string, char)
   integer = Integer(hex_string, 16)
