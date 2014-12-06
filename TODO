@@ -14,3 +14,7 @@ Answer: A keysize of 29 seems to be the best
 I should maybe be careful about the string encoding? I'm not sure if
 the substring business I did will actually work correctly
 
+TODO: Something is wrong with my score function. It should actually check the
+distribution of letters instead of just scoring according to frequency.
+Thinking that the scoring according to frequency would seems kind of silly now.
+Distribution would be much more useful.
