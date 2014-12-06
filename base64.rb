@@ -1,5 +1,9 @@
+# coding: utf-8
 require 'pry'
 require 'minitest/autorun'
+
+Pry.config.pager = false
+
 ONE_THREE='1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736'
 
 TEXT_1_4 = <<-EOS
@@ -393,39 +397,89 @@ def first_four_slices_for_size(string, size)
   end
 end
 
-def score(string)
-  string.each_char.map do |c|
-    case c
-    when 'e'
-      12.7#1
-    when 't'
-      9.1#2
-    when 'a'
-      8.2#3
-    when 'o'
-      7.5#4
-    when 'i'
-      7.0#5
-    when 'n'
-      6.7#6
-    when 's'
-      6.3#7
-    when 'h'
-      6.1#8
-    when 'r'
-      6.0#9
-    when 'd'
-      4.3#10
-    when 'l'
-      4.0#11
-    when 'c'
-      2.8#12
-    when /[^[:print:]\x00]/
-      -20.0
-    else
-      0
+def char_distribution(string)
+  chars = string.scan(/\w/)
+  chars.map!(&:downcase)
+  binding.pry
+
+  distribution = {}
+
+  %w(e t a o i n s h r d l c).each do |char|
+    distribution[char] = if chars.length == 0
+                           0
+                         else
+                           chars.count(char).to_f/chars.length*100
+                         end
+  end
+
+  distribution
+end
+
+Class.new(Minitest::Test) do
+  def test_char_distribution
+    appear_times = {
+      "e" => 3,
+      "t" => 6,
+      "a" => 10,
+      "o" => 1,
+      "i" => 2,
+      'n' => 5,
+      's' => 1,
+      'h' => 1,
+      'r' => 1,
+      'd' => 1,
+      'l' => 1,
+      'c' => 1,
+    }
+
+    output = {}
+    
+    appear_times.each do |key, val|
+      output[key] = val.to_f/appear_times.values.reduce(&:+)*100
     end
-  end.inject(&:+)
+
+    input = ""
+
+    appear_times.each do |key, value|
+      input << key * value
+    end
+
+    assert_equal(output, char_distribution(input))
+  end
+end
+
+def score(string)
+  chars = string.scan(/w/)
+  chars.map!(&:downcase)
+
+  distribution = {}
+
+  %w(e t a o i n s h r d l c).each do |char|
+    distribution[char] = if chars.length == 0
+                           0
+                         else
+                           chars.count(char).to_f/chars.length*100
+                         end
+  end
+
+  correct_distribution = {
+    'e' => 12.7,
+    't' => 9.1,
+    'a' => 8.2,
+    'o' => 7.5,
+    'i' => 7.0,
+    'n' => 6.7,
+    's' => 6.3,
+    'h' => 6.1,
+    'r' => 6.0,
+    'd' => 4.3,
+    'l' => 4.0,
+    'c' => 2.8,
+  }
+
+  distribution.keys.reduce(0) do |accum, char|
+    accum += (distribution[char] - correct_distribution[char])**2
+  end
 end
 
 def xor_with_character(hex_string, char)
@@ -574,7 +628,7 @@ Class.new(Minitest::Test) do
   def test_score_for_char
     input = new_fixed_xor("ll\t", "c")
 
-    assert_equal(7, score_for_char(input, "c"))
+    assert_equal(8, score_for_char(input, "c"))
   end
 end
 
@@ -587,13 +641,23 @@ def best_char_for_string(string)
     accum << [c, score_for_char(string, c)]
   end
   sorted = accum.sort_by {|a| a[1]}
-  sorted.last[0]
+  sorted[0][0]
 end
 
 
 Class.new(Minitest::Test) do
   def test_best_char_for_string
-    input = new_fixed_xor("I want a banana and need eet reeely badly", "c")
+    string =
+      "Hereupon Legrand arose, with a grave and stately air, and brought me the beetle
+from a glass case in which it was enclosed. It was a beautiful scarabaeus, and, at
+that time, unknown to naturalists—of course a great prize in a scientific point
+of view. There were two round black spots near one extremity of the back, and a
+long one near the other. The scales were exceedingly hard and glossy, with all the
+appearance of burnished gold. The weight of the insect was very remarkable, and,
+taking all things into consideration, I could hardly blame Jupiter for his opinion
+respecting it."
+
+    input = new_fixed_xor(string, "c")
 
     assert_equal("c", best_char_for_string(input))
   end
@@ -609,7 +673,7 @@ Class.new(Minitest::Test) do
 
       accum << char
     end
-
-    puts new_fixed_xor(string, accum)
   end
 end
+
+binding.pry
