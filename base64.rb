@@ -400,7 +400,6 @@ end
 def char_distribution(string)
   chars = string.scan(/\w/)
   chars.map!(&:downcase)
-  binding.pry
 
   distribution = {}
 
@@ -412,7 +411,7 @@ def char_distribution(string)
                          end
   end
 
-  distribution
+   distribution
 end
 
 Class.new(Minitest::Test) do
@@ -433,7 +432,7 @@ Class.new(Minitest::Test) do
     }
 
     output = {}
-    
+
     appear_times.each do |key, val|
       output[key] = val.to_f/appear_times.values.reduce(&:+)*100
     end
@@ -449,36 +448,25 @@ Class.new(Minitest::Test) do
 end
 
 def score(string)
-  chars = string.scan(/w/)
-  chars.map!(&:downcase)
-
-  distribution = {}
-
-  %w(e t a o i n s h r d l c).each do |char|
-    distribution[char] = if chars.length == 0
-                           0
-                         else
-                           chars.count(char).to_f/chars.length*100
-                         end
-  end
+  distribution = char_distribution(string)
 
   correct_distribution = {
-    'e' => 12.7,
-    't' => 9.1,
-    'a' => 8.2,
-    'o' => 7.5,
-    'i' => 7.0,
-    'n' => 6.7,
-    's' => 6.3,
-    'h' => 6.1,
-    'r' => 6.0,
-    'd' => 4.3,
-    'l' => 4.0,
-    'c' => 2.8,
+    'e' => 12.702,
+    't' => 9.056,
+    'a' => 8.167,
+    'o' => 7.507,
+    'i' => 6.966,
+    'n' => 6.749,
+    's' => 6.327,
+    'h' => 6.094,
+    'r' => 5.987,
+    'd' => 4.253,
+    'l' => 4.025,
+    'c' => 2.782,
   }
 
-  distribution.keys.reduce(0) do |accum, char|
-    accum += (distribution[char] - correct_distribution[char])**2
+  correct_distribution.keys.reduce(0) do |accum, char|
+    accum += (distribution[char]/100 - correct_distribution[char]/100)**2
   end
 end
 
@@ -591,7 +579,7 @@ I go crazy when I hear a cymbal
   end
 end
 
-BreakingRepeatingXOR = Class.new do
+BestKeysize = Class.new do
   def self.best_keysize
     string = File.read("1_6.txt")
     raw_string = base_64_to_string(string)
@@ -634,11 +622,8 @@ end
 
 def best_char_for_string(string)
   accum = []
-  ("a".."z").each do |c|
-    accum << [c, score_for_char(string, c)]
-  end
-  ("A".."Z").each do |c|
-    accum << [c, score_for_char(string, c)]
+  (1..255).each do |c|
+    accum << [c.chr, score_for_char(string, c.chr)]
   end
   sorted = accum.sort_by {|a| a[1]}
   sorted[0][0]
@@ -663,8 +648,8 @@ respecting it."
   end
 end
 
-Class.new(Minitest::Test) do
-  def test_thing_to_do
+BreakRepeatingXor = Class.new do
+  def self.act
     string = base_64_to_string(File.read("1_6.txt").delete("\n"))
     accum = ""
     (0..28).each do |pos|
@@ -673,7 +658,6 @@ Class.new(Minitest::Test) do
 
       accum << char
     end
+    accum
   end
 end
-
-binding.pry
