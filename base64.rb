@@ -616,16 +616,22 @@ Class.new(Minitest::Test) do
   def test_score_for_char
     input = new_fixed_xor("ll\t", "c")
 
-    assert_equal(8, score_for_char(input, "c"))
+    assert_equal(0.9810521127, score_for_char(input, "c"))
+  end
+end
+
+def letter_score(string)
+  string.each_char.inject(0) do |accum, c|
+    c =~ /[:print:]/ ? accum + 1 : accum
   end
 end
 
 def best_char_for_string(string)
   accum = []
   (1..255).each do |c|
-    accum << [c.chr, score_for_char(string, c.chr)]
+    accum << [c.chr, score_for_char(string, c.chr), letter_score(new_fixed_xor(string, c.chr))]
   end
-  sorted = accum.sort_by {|a| a[1]}
+  sorted = accum.sort_by {|a| a[1]*1_000_000_000 - a[2]}
   sorted[0][0]
 end
 
@@ -658,6 +664,10 @@ BreakRepeatingXor = Class.new do
 
       accum << char
     end
-    accum
+    {
+      original_string: string,
+      key: accum,
+      result: new_fixed_xor(string, accum),
+    }
   end
 end
