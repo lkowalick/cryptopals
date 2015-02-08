@@ -4,29 +4,6 @@ require 'minitest/autorun'
 
 Pry.config.pager = false
 
-ONE_THREE='1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736'
-
-LOOKUP = %w(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9 + /).freeze
-
-def hex_string_to_base_64(hex_string)
-  binary = hex_string_to_binary_string(hex_string)
-
-  binary = binary + "0" * (6 - binary.size % 6) unless binary.size % 6 == 0
-
-  accum = ""
-  binary.each_char.each_slice(6) do |s|
-    accum << LOOKUP[Integer(s.join(''), 2)]
-  end
-  accum
-end
-
-def hex_string_to_binary_string(hex_string)
-  binary = ""
-  hex_string.each_char.each do |c|
-    binary << "%04b" % Integer(c, 16)
-  end
-  binary
-end
 
 def fixed_XOR(string1, string2)
   int1 = Integer(string1, 16)
@@ -35,26 +12,6 @@ def fixed_XOR(string1, string2)
   (int1 ^ int2).to_s(16)
 end
 
-def hex_string_to_string(hex_string)
-  chars = hex_string.each_char.each_slice(2).map do |hex1, hex2|
-    Integer(hex1 + hex2, 16)
-  end
-  chars.map(&:chr).join
-end
-
-def hex_string_to_bytes(hex_string)
-  chars = hex_string.each_char.each_slice(2).map do |hex1, hex2|
-    Integer(hex1 + hex2, 16)
-  end
-end
-
-def bytes_to_string(bytes)
-  bytes.map(&:chr).join
-end
-
-def base_64_to_string(input)
-  input.unpack("m").first
-end
 
 def average_hamming_distance_for_keysize(keysize)
   base64 = File.read("1_6.txt")
@@ -149,10 +106,6 @@ def xor_with_character(hex_string, char)
   bytes_to_string(bytes)
 end
 
-def bytes_to_hex(bytes)
-  bytes.map{|b| "%02x" % b}.join
-end
-
 def best_guess_for_hex_string(hex_string)
   (0..255).map{|l| xor_with_character(hex_string,l.chr)}.max_by{|str| score(str)}
 end
@@ -194,15 +147,6 @@ def average_pairwise_normalized_hamming_distance(array_of_strings)
   Float(total)/array_of_strings[0].length
 end
 
-Class.new(Minitest::Test) do
-  def test_hex_string_to_base_64
-    input =
-"49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d"
-    output =
-      "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t"
-
-    assert_equal(output, hex_string_to_base_64(input))
-  end
 
   def test_fixed_xor
     input = <<-EOS
@@ -224,16 +168,7 @@ I go crazy when I hear a cymbal
     assert_equal(37, hamming_distance(input2,input1))
   end
 
-  def test_array_of_integers_to_hex_string
-    assert_equal("","")
-  end
-
-  def test_base_64_to_string
-    output = "any carnal pleasur"
-    input = "YW55IGNhcm5hbCBwbGVhc3Vy"
-    assert_equal(output, base_64_to_string(input))
-  end
-
+ 
   def test_first_four_slices_for_size
     input = "001002003004005"
     output = ["001","002","003","004"]
