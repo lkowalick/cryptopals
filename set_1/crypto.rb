@@ -5,6 +5,7 @@ require 'minitest/autorun'
 Pry.config.pager = false
 
 
+
 def fixed_XOR(string1, string2)
   int1 = Integer(string1, 16)
   int2 = Integer(string2, 16)
@@ -133,10 +134,14 @@ def hamming_distance(string1, string2)
   zipped.map{|e| e[0] ^ e[1]}.map{|e| "%08b" % e}.join.each_char.count{ |e| e == "1" }
 end
 
-def hamming_distance_for_key_size(size, string)
-  string1 = string[0,size]
-  string2 = string[size,size]
-  hamming_distance(string1, string2)
+def hamming_distance_for_key_size(size, string, num_blocks)
+  blocks = num_blocks.times.map do |i|
+    offset = i*size
+    string[offset, size]
+  end
+  blocks.combination(2).map do |combo|
+    hamming_distance(combo[0], combo[1])
+  end.inject(:+)
 end
 
 def average_pairwise_normalized_hamming_distance(array_of_strings)
@@ -147,42 +152,6 @@ def average_pairwise_normalized_hamming_distance(array_of_strings)
   Float(total)/array_of_strings[0].length
 end
 
-
-  def test_fixed_xor
-    input = <<-EOS
-Burning 'em, if you ain't quick and nimble
-I go crazy when I hear a cymbal
-    EOS
-    .chomp, 'ICE'
-
-    output = "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"
-
-    assert_equal(fixed_xor(*input), output)
-  end
-
-  def test_hamming_distance
-    input1 = "this is a test"
-    input2 = "wokka wokka!!!"
-
-    assert_equal(37, hamming_distance(input1,input2))
-    assert_equal(37, hamming_distance(input2,input1))
-  end
-
- 
-  def test_first_four_slices_for_size
-    input = "001002003004005"
-    output = ["001","002","003","004"]
-    assert_equal(output, first_four_slices_for_size(input, 3))
-  end
-
-  def test_average_pairwise_normalized_hamming_distance
-    output = 74.0/("this is a test".length)
-
-    input = ["this is a test", "wokka wokka!!!", "wokka wokka!!!"]
-
-    assert_equal(output, average_pairwise_normalized_hamming_distance(input))
-  end
-end
 
 BestKeysize = Class.new do
   def self.best_keysize
